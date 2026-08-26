@@ -1,4 +1,12 @@
-// reset.mjs — Resets the demo space to pre-run state
+// ┌─────────────────────────────────────────────────────────────────────────┐
+// │  ⚠️  DEMO / STAGING USE ONLY                                            │
+// │                                                                         │
+// │  This script PERMANENTLY DELETES entries and CLEARS audience fields.    │
+// │  It is intended only for resetting a demo or staging space between      │
+// │  test runs. NEVER run it against a production space.                    │
+// └─────────────────────────────────────────────────────────────────────────┘
+//
+// reset.mjs — Resets a demo space to pre-run state
 //
 // Usage:
 //   CONTENTFUL_MANAGEMENT_TOKEN=<token> CONTENTFUL_SPACE_ID=<space> node reset.mjs
@@ -31,9 +39,24 @@ if (!SPACE_ID) {
   process.exit(1);
 }
 
+import readline from 'readline';
+
 const cma = createClient({ accessToken: TOKEN }, { type: 'plain' });
 
+async function confirm(question) {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise(resolve => rl.question(question, answer => { rl.close(); resolve(answer.trim()); }));
+}
+
 async function main() {
+  console.log('\n⚠️  WARNING: This will PERMANENTLY DELETE entries in space:', SPACE_ID);
+  console.log('This script is for demo/staging spaces only.\n');
+  const answer = await confirm('Type the space ID to confirm you want to proceed: ');
+  if (answer !== SPACE_ID) {
+    console.log('Space ID did not match. Aborting.');
+    process.exit(0);
+  }
+  console.log();
   console.log('Fetching entries…');
 
   const [topics, tasks, routes] = await Promise.all([
