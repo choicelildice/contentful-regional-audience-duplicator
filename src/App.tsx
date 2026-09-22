@@ -153,8 +153,14 @@ export default function App({ sdk }: Props) {
     async function processArticle(entry: DemoEntry, contentTypeId: string) {
       updateEntry(entry.id, { status: 'running' });
       try {
-        const newTitle = replaceBrand(entry.rawFields.title?.['en-US'] ?? '');
-        const newSlug = replaceBrand(entry.rawFields.slug?.['en-US'] ?? '');
+        // Only include fields that exist on the original entry — content
+        // types vary across spaces (e.g. some don't have a "slug" field).
+        const titleField = entry.rawFields.title?.['en-US'] != null
+          ? { title: { 'en-US': replaceBrand(entry.rawFields.title['en-US']) } }
+          : {};
+        const slugField = entry.rawFields.slug?.['en-US'] != null
+          ? { slug: { 'en-US': replaceBrand(entry.rawFields.slug['en-US']) } }
+          : {};
 
         // For tasks: point parentTopic at the Japan copy if one was created
         const parentField =
@@ -173,8 +179,8 @@ export default function App({ sdk }: Props) {
           { contentTypeId, environmentId: envId },
           {
             fields: {
-              title: { 'en-US': newTitle },
-              slug: { 'en-US': newSlug },
+              ...titleField,
+              ...slugField,
               ...(entry.rawFields.body ? { body: entry.rawFields.body } : {}),
               ...parentField,
               audiences: { 'en-US': [audienceLink(TARGET_AUDIENCE_ID)] },
