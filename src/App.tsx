@@ -153,8 +153,8 @@ export default function App({ sdk }: Props) {
     async function processArticle(entry: DemoEntry, contentTypeId: string) {
       updateEntry(entry.id, { status: 'running' });
       try {
-        const newTitle = replaceBrand(entry.rawFields.title['en-US']);
-        const newSlug = replaceBrand(entry.rawFields.slug['en-US']);
+        const newTitle = replaceBrand(entry.rawFields.title?.['en-US'] ?? '');
+        const newSlug = replaceBrand(entry.rawFields.slug?.['en-US'] ?? '');
 
         // For tasks: point parentTopic at the Japan copy if one was created
         const parentField =
@@ -203,7 +203,7 @@ export default function App({ sdk }: Props) {
     async function processRoute(entry: DemoEntry) {
       updateEntry(entry.id, { status: 'running' });
       try {
-        const newPath = replaceBrand(entry.rawFields.path['en-US']);
+        const newPath = replaceBrand(entry.rawFields.path?.['en-US'] ?? '');
         const linkedId: string | undefined = entry.rawFields.linkedContent?.['en-US']?.sys?.id;
         const japanLinkedId = linkedId ? (idMap.get(linkedId) ?? linkedId) : undefined;
 
